@@ -1,53 +1,17 @@
 <?php
-
-/**
- * Inclui o arquivo de conexão com o banco de dados.
- */
+session_start(); // Para mensagens flash (opcional)
 require __DIR__ . "/connect.php";
 
-/**
- * Captura o parâmetro "id" enviado pela URL
- * e valida se ele é um número inteiro válido.
- *
- * Exemplo de URL:
- * edit.php?id=3
- */
 $id = filter_input(INPUT_GET, "id", FILTER_VALIDATE_INT);
-
-/**
- * Se o ID não for válido, o script é interrompido.
- */
 if (!$id) {
     die("ID inválido.");
 }
 
-/**
- * Obtém a conexão com o banco de dados.
- */
 $pdo = Connect::getInstance();
-
-/**
- * Prepara a consulta SQL para buscar apenas um usuário
- * com o ID informado.
- *
- * LIMIT 1 reforça que apenas um registro será retornado.
- */
 $stmt = $pdo->prepare("SELECT * FROM users WHERE id = :id LIMIT 1");
-
-/**
- * Executa a consulta, passando o valor do ID.
- */
 $stmt->execute([":id" => $id]);
-
-/**
- * Busca o primeiro registro encontrado.
- * Como o ID é único, esperamos apenas um usuário.
- */
 $user = $stmt->fetch();
 
-/**
- * Se nenhum aluno for encontrado, interrompe a execução.
- */
 if (!$user) {
     die("Aluno não encontrado.");
 }
@@ -58,45 +22,47 @@ if (!$user) {
 
 <head>
     <meta charset="UTF-8">
-    <title>Editar aluno</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Aluno</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-
-    <h1>Editar aluno</h1>
-
-    <!--
-        Formulário responsável por enviar os dados atualizados
-        para o arquivo update.php.
-    -->
-    <form action="update.php" method="post">
-        <!--
-            Campo oculto que envia o ID do aluno.
-            Ele é necessário para que o update.php saiba
-            qual registro deve ser atualizado.
-        -->
-        <input type="hidden" name="id" value="<?= $user["id"] ?>">
-
-        <p>
-            <label>Nome:</label><br>
-            <input type="text" name="name" value="<?= htmlspecialchars($user["name"]) ?>" required>
-        </p>
-
-        <p>
-            <label>E-mail:</label><br>
-            <input type="email" name="email" value="<?= htmlspecialchars($user["email"]) ?>" required>
-        </p>
-
-        <p>
-            <label>Curso:</label><br>
-            <input type="text" name="document" value="<?= htmlspecialchars($user["document"]) ?>" required>
-        </p>
-
-        <button type="submit">Atualizar</button>
-    </form>
-
-    <p><a href="index.php">Voltar</a></p>
-
+    <div class="container">
+        <div class="card" style="max-width: 700px; margin: 0 auto;">
+            <div class="card-header">
+                <h1><i class="fas fa-user-edit"></i> Editar Aluno</h1>
+                <p>Atualize os dados do aluno cadastrado</p>
+            </div>
+            <div class="card-body">
+                <form action="update.php" method="post">
+                    <input type="hidden" name="id" value="<?= $user['id'] ?>">
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Nome completo</label>
+                        <input type="text" name="name" class="form-control"
+                            value="<?= htmlspecialchars($user['name']) ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-envelope"></i> E-mail</label>
+                        <input type="email" name="email" class="form-control"
+                            value="<?= htmlspecialchars($user['email']) ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-graduation-cap"></i> Curso</label>
+                        <input type="text" name="document" class="form-control"
+                            value="<?= htmlspecialchars($user['document']) ?>" required>
+                    </div>
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Atualizar</button>
+                        <a href="index.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Cancelar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
 </body>
 
 </html>
